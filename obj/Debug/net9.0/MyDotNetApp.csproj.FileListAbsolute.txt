@@ -123,3 +123,4 @@ E:\cognizant\dotnet\MyDotNetApp\obj\Debug\net9.0\refint\MyDotNetApp.dll
 E:\cognizant\dotnet\MyDotNetApp\obj\Debug\net9.0\MyDotNetApp.pdb
 E:\cognizant\dotnet\MyDotNetApp\obj\Debug\net9.0\MyDotNetApp.genruntimeconfig.cache
 E:\cognizant\dotnet\MyDotNetApp\obj\Debug\net9.0\ref\MyDotNetApp.dll
+E:\cognizant\dotnet\MyDotNetApp\obj\Debug\net9.0\MyDotNetApp.sourcelink.json

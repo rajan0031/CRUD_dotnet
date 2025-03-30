@@ -1,138 +1,56 @@
 using Microsoft.AspNetCore.Mvc;
-using MyDotNetApp.Data;
 using MyDotNetApp.Models;
+using MyDotNetApp.Services;
 
 namespace MyDotNetApp.Controllers
 {
-    [ApiController]
-    public class UserController : ControllerBase
+    public class UserController
     {
-        private readonly ApplicationDbContext _context;
+        private readonly UserService _userService;
 
-        public UserController(ApplicationDbContext context)
+        public UserController(UserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
-        // ✅ Route for creating a new user
-        [HttpPost("api/users/create")]
-        public IActionResult CreateUser([FromBody] User user)
+        public IActionResult CreateUser(User user)
         {
-            if (user == null) return BadRequest(new { message = "Invalid user data!" });
+            var result = _userService.AddUser(user);
+            if (!result.success) return new BadRequestObjectResult(new { message = result.message });
 
-            _context.Users.Add(user);
-            _context.SaveChanges();
-
-            return Ok(new { message = "User added successfully!", user });
+            return new OkObjectResult(new { message = result.message, user = result.user });
         }
 
-        // ✅ Route for fetching all users with pagination
-        [HttpGet("api/users/list")]
-        public IActionResult GetUsers(int page = 1, int pageSize = 10)
+        public IActionResult GetUsers(int page, int pageSize)
         {
-            try
-            {
-                var totalUsers = _context.Users.Count();
-                var users = _context.Users
-                                    .Skip((page - 1) * pageSize)
-                                    .Take(pageSize)
-                                    .ToList();
+            var result = _userService.GetUsers(page, pageSize);
+            if (!result.success) return new NotFoundObjectResult(new { message = result.message });
 
-                if (!users.Any()) return NotFound(new { message = "No users found!" });
-
-                return Ok(new
-                {
-                    totalUsers,
-                    page,
-                    pageSize,
-                    users
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred!", error = ex.Message });
-            }
+            return new OkObjectResult(result.data);
         }
 
-
-        // edit the details of the user by user id 
-
-       [HttpPut("api/users/update/{Id}")] // ✅ Using "Id" (uppercase)
-public IActionResult UpdateUser(int Id, [FromBody] User updatedUser) // ✅ Using "Id" (uppercase)
-{
-    Console.WriteLine($"UpdateUser called with ID: {Id}");
-
-    if (updatedUser == null) 
-        return BadRequest(new { message = "Invalid user data!" });
-
-    var existingUser = _context.Users.Find(Id); // ✅ Now using "Id" (uppercase)
-    if (existingUser == null) 
-        return NotFound(new { message = "User not found!" });
-
-    // Update user details
-    existingUser.Name = updatedUser.Name;
-    existingUser.Email = updatedUser.Email;
-
-    _context.SaveChanges();
-
-    return Ok(new { message = "User updated successfully!", existingUser });
-}
-
-
-//  ##############// delete a user from the database 
-
-[HttpDelete("api/users/delete/{Id}")] // ✅ Route for deleting user
-public IActionResult DeleteUser(int Id) // ✅ Using "Id" (uppercase)
-{
-    Console.WriteLine($"DeleteUser called with ID: {Id}");
-
-    var existingUser = _context.Users.Find(Id);
-    if (existingUser == null) 
-        return NotFound(new { message = "User not found!" });
-
-    _context.Users.Remove(existingUser);
-    _context.SaveChanges();
-
-    return Ok(new { message = "User deleted successfully!" });
-}
-
-
-// get all users 
-  [HttpGet("api/users/getuserdetails/{Id}")]
-       public IActionResult GetAllUsers(int? Id, int page = 1, int pageSize = 10)
-{
-    try
-    {
-        if (Id.HasValue) // ✅ If Id is provided, return a single user
+        public IActionResult GetUserById(int id)
         {
-            var user = _context.Users.Find(Id.Value);
-            if (user == null) return NotFound(new { message = "User not found!" });
+            var result = _userService.GetUserById(id);
+            if (!result.success) return new NotFoundObjectResult(new { message = result.message });
 
-            return Ok(new { message = "User found!", user });
+            return new OkObjectResult(new { message = result.message, user = result.user });
         }
 
-        // ✅ If no Id is provided, return paginated users
-        var totalUsers = _context.Users.Count();
-        var users = _context.Users
-                            .Skip((page - 1) * pageSize)
-                            .Take(pageSize)
-                            .ToList();
-
-        if (!users.Any()) return NotFound(new { message = "No users found!" });
-
-        return Ok(new
+        public IActionResult UpdateUser(int id, User updatedUser)
         {
-            totalUsers,
-            page,
-            pageSize,
-            users
-        });
-    }
-    catch (Exception ex)
-    {
-        return StatusCode(500, new { message = "An error occurred!", error = ex.Message });
-    }
-}
+            var result = _userService.UpdateUser(id, updatedUser);
+            if (!result.success) return new NotFoundObjectResult(new { message = result.message });
 
+            return new OkObjectResult(new { message = result.message, user = result.user });
+        }
+
+        public IActionResult DeleteUser(int id)
+        {
+            var result = _userService.DeleteUser(id);
+            if (!result.success) return new NotFoundObjectResult(new { message = result.message });
+
+            return new OkObjectResult(new { message = result.message });
+        }
     }
 }
