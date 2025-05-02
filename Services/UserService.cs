@@ -79,3 +79,82 @@ namespace MyDotNetApp.Services
         }
     }
 }
+
+
+
+
+Student Records Management - GET By Id
+Description
+
+
+
+
+
+Student Records Management - GET By Id
+
+A school is looking to create a web service application using Web API in .NET Framework to manage student records. The application will provide endpoints to retrieve the student information.
+
+Create a Service application using Web API .Net Framework.
+
+ 
+
+Functionality  
+
+1. In class  Student.cs the properties are already declared.
+
+2. Below code snippet is already given with values predefined in StudentController,
+
+public static List<Student> StudentRecords = new List<Student>()
+
+  Id
+
+  FirstName
+
+  LastName
+
+  GPA
+
+  101
+
+  John
+
+  Doe
+
+   3.6
+
+  102
+
+ Jane
+
+  Smith
+
+   3.9
+
+  103
+
+  Robert
+
+  Johnson
+
+  3.5
+
+  104
+
+  Emily
+
+  Brown
+
+   4.0
+
+  105
+
+  Michael
+
+  Lee
+
+   3.8
+
+ 
+3. Create a GET method with attribute routing "~/api/get-student/{id}" that returns the student record as a student object.
+
+The GetStudentById method retrieves the student detail from the StudentRecords and return the detail as an object. The ID should be passed as a parameter marked as [FromUri].
